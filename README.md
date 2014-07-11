@@ -18,3 +18,17 @@ To run the playbook use:
 ```
 ansible-playbook solr/production/ansible/site.yml
 ```
+
+If you're using amazon EC2 with Ubuntu image, your user will be ubuntu
+by default. So with EC2 you will need:
+
+```
+ansible-playbook solr/production/ansible/site.yml  -u ubuntu -s
+```
+`-s` tells to use sudo.
+
+If you're using key authentication, add your pem file to ssh-agent with:
+
+`ssh-add <path_to_pem_file>`.
+
+Default port will be `8080`.

@@ -1,0 +1,15 @@
+- hosts: all
+
+  vars:
+    jetty_version: 8.1.15.v20140411
+    src_jetty_path: jetty-distribution-{{jetty_version}}
+    jetty_archive_path: "{{src_jetty_path}}.tar.gz"
+    jetty_download_url: http://mirror.tspu.ru/eclipse/jetty/{{jetty_version}}/dist/{{jetty_archive_path}}
+
+    solr_version: 4.9.0
+    src_solr_path: solr-{{solr_version}}
+    solr_archive_path: "{{src_solr_path}}.tgz"
+    solr_download_url: http://apache-mirror.rbc.ru/pub/apache/lucene/solr/{{solr_version}}/{{solr_archive_path}}
+
+  tasks:
+    - include: provision.yml

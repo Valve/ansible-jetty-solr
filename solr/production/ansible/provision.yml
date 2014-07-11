@@ -1,0 +1,137 @@
+- name: fix locales
+  tags: locale
+  shell: >
+    locale-gen en_US.UTF-8 && dpkg-reconfigure -fnoninteractive locales && update-locale LC_ALL="en_US.UTF-8" LANG="en_US.UTF-8" LANGUAGE="en_US" && touch ~/.locale_ok creates=~/.locale_ok
+
+- name: update apt cache
+  tags: update
+  action: apt update_cache=yes
+
+- name: upgrade OS
+  tags: update
+  action: apt upgrade=safe
+
+- name: install packages for Oracle JDK 7
+  tags: java
+  apt: pkg={{item}} state=latest
+  with_items:
+    - debconf
+    - debconf-utils
+
+- name: add webupd8team repo
+  apt_repository: repo="ppa:webupd8team/java"
+  tags: java
+
+- name: retrieve status of oracle licences
+  tags: java
+  shell: >
+    debconf-get-selections | grep -q {{item}} && echo -n 'yes' || echo -n 'no'
+  register: java_license_status
+  changed_when: False
+  with_items: java_ora_versions
+
+- name: accept oracle licenses
+  tags: java
+  shell: >
+    /bin/echo -e {{item.item}} shared/accepted-oracle-license-v1-1 select true | debconf-set-selections
+  when: item.stdout != "yes"
+  with_items: java_license_status.results
+
+- name: install Oracle JDK 7
+  tags: java
+  apt: pkg={{item}} state=latest update_cache=yes
+  with_items:
+    -  oracle-java7-installer
+    -  oracle-java7-set-default
+
+- name: add jetty user
+  tags: user
+  user: name=jetty shell=/bin/false createhome=no
+
+- name: download jetty
+  tags: jetty
+  get_url: url={{jetty_download_url}} dest=/tmp
+
+- name: extract jetty archive
+  tags: jetty
+  command: tar -xf {{jetty_archive_path}} chdir=/tmp
+
+- name: copy jetty to destination directory
+  tags: jetty
+  command: mv /tmp/{{src_jetty_path}} /opt/jetty
+
+- name: make jetty owner of jetty home
+  tags: jetty
+  command: "{{item}}"
+  with_items:
+    - cp -a /opt/jetty/bin/jetty.sh /etc/init.d/jetty
+
+- name: configure jetty
+  tags: jetty
+  copy: src=jetty/jetty dest=/etc/default/jetty
+
+- name: generate password for jetty
+  tags: jetty
+  shell: 'openssl rand -base64 24 | sed "s/[+=\/:]//g"'
+  register: jetty_password
+
+- name: jetty real.properties generation and copy
+  tags: jetty
+  template: src=jetty/realm.properties.j2 dest=/opt/jetty/etc/realm.properties
+
+- name: jetty webdefault.xml copy
+  tags: jetty
+  copy: src=jetty/webdefault.xml dest=/opt/jetty/etc/webdefault.xml
+
+- name: make jetty autostart on reboot
+  tags: jetty
+  command: "{{item}}"
+  with_items:
+    - echo JETTY_HOME >> ~/.profile && source ~/.profile
+    - update-rc.d jetty defaults
+
+- name: download solr
+  tags: solr
+  get_url: url={{solr_download_url}} dest=/tmp
+
+- name: extract solr archive
+  tags: solr
+  command: tar -xf {{solr_archive_path}} chdir=/tmp
+
+- name: copy solr to destination directory
+  tags: solr
+  command: "{{item}}"
+  with_items:
+    - cp -a /tmp/{{src_solr_path}}/dist/solr-{{solr_version}}.war /opt/jetty/webapps/solr.war
+    - cp -a /tmp/{{src_solr_path}}/example/solr /opt/solr
+    - cp -a /tmp/{{src_solr_path}}/dist /opt/solr
+    - cp -a /tmp/{{src_solr_path}}/contrib /opt/solr
+    - cp -a /tmp/{{src_solr_path}}/example/contexts/solr-jetty-context.xml /opt/jetty/webapps/solr.xml
+    - bash -c 'cp /tmp/{{src_solr_path}}/example/lib/ext/* /opt/jetty/lib/ext'
+    - rm -rf /opt/solr/collection1/conf
+    - rm -rf /opt/solr/collection1/core.properties
+    - mkdir  /opt/solr/collection1/conf
+
+- name: copy local solr config to the server
+  tags: solr
+  copy: "{{item}}"
+  with_items:
+    - src=../../common/conf/solrconfig.xml dest=/opt/solr/collection1/conf/solrconfig.xml
+    - src=../../common/conf/schema.xml dest=/opt/solr/collection1/conf/schema.xml
+    - src=../../common/conf/stopwords.txt dest=/opt/solr/collection1/conf/stopwords.txt
+    - src=solr/core.properties dest=/opt/solr/collection1/core.properties
+
+- name: chown all dirs
+  tags: solr
+  command: "{{item}}"
+  with_items:
+    - chown -R jetty:jetty /opt/jetty
+    - chown -R jetty:jetty /opt/solr
+
+- name: start solr
+  tags: solr
+  command: service jetty start
+
+- debug: msg="solr user name is solr, password is {{jetty_password.stdout}}"
+  tags: solr
+

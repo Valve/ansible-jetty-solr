@@ -21,7 +21,7 @@
         <filter class="solr.StandardFilterFactory"/>
         <filter class="solr.LowerCaseFilterFactory"/>
         <filter class="solr.StopFilterFactory" words="stopwords.txt" ignoreCase="true"/>
-        <filter class="solr.PorterStemFilterFactory"/>
+        <filter class="solr.KStemFilterFactory"/>
         <!--<filter class="solr.NGramFilterFactory" minGramSize="2" maxGramSize="30"/>-->
       </analyzer>
       <analyzer type="query">
@@ -29,7 +29,7 @@
         <filter class="solr.StandardFilterFactory"/>
         <filter class="solr.LowerCaseFilterFactory"/>
         <filter class="solr.StopFilterFactory" words="stopwords.txt" ignoreCase="true"/>
-        <filter class="solr.PorterStemFilterFactory"/>
+        <filter class="solr.KStemFilterFactory"/>
       </analyzer>
     </fieldType>
     <!-- *** This fieldType is used by Sunspot! *** -->

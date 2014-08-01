@@ -114,12 +114,13 @@
 
 - name: copy local solr config to the server
   tags: solr
-  copy: "{{item}}"
+  copy: src={{item.src}} dest={{item.dest}}
   with_items:
-    - src=../../common/conf/solrconfig.xml dest=/opt/solr/collection1/conf/solrconfig.xml
-    - src=../../common/conf/schema.xml dest=/opt/solr/collection1/conf/schema.xml
-    - src=../../common/conf/stopwords.txt dest=/opt/solr/collection1/conf/stopwords.txt
-    - src=solr/core.properties dest=/opt/solr/collection1/core.properties
+    - {src: "../../common/conf/solrconfig.xml", dest: "/opt/solr/collection1/conf/solrconfig.xml"}
+    - {src: "../../common/conf/schema.xml", dest: "/opt/solr/collection1/conf/schema.xml"}
+    - {src: "../../common/conf/stopwords.txt", dest: "/opt/solr/collection1/conf/stopwords.txt"}
+    - {src: "solr/core.properties", dest: "/opt/solr/collection1/core.properties"}
+
 
 - name: chown all dirs
   tags: solr
@@ -134,4 +135,3 @@
 
 - debug: msg="solr user name is solr, password is {{jetty_password.stdout}}"
   tags: solr
-

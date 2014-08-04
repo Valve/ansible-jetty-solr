@@ -151,7 +151,7 @@
   </requestHandler>
   <requestHandler name="/dataimport" class="org.apache.solr.handler.dataimport.DataImportHandler">
     <lst name="defaults">
-      <str name="config">data-config.xml</str>
+      <str name="config">../${solr.core.name}/conf/data-config.xml</str>
     </lst>
   </requestHandler>
 

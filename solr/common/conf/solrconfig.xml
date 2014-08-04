@@ -4,10 +4,14 @@
   <dataDir>${solr.data.dir:}</dataDir>
   <directoryFactory name="DirectoryFactory"
                     class="${solr.directoryFactory:solr.NRTCachingDirectoryFactory}"/> 
+  <lib dir="../contrib/dataimporthandler/lib" regex=".*\.jar"/>
+  <lib dir="../dist/" regex="solr-dataimporthandler-.*\.jar"/>
+  <lib dir="../lib/" regex="postgresql-.*\.jar"/>
+
   <indexConfig>
     <maxIndexingThreads>2</maxIndexingThreads>
     <useCompoundFile>true</useCompoundFile>
-    <ramBufferSizeMB>300</ramBufferSizeMB>
+    <ramBufferSizeMB>100</ramBufferSizeMB>
     <maxBufferedDocs>10000</maxBufferedDocs>
     <mergePolicy class="org.apache.lucene.index.TieredMergePolicy">
       <int name="maxMergeAtOnce">4</int>
@@ -145,6 +149,12 @@
 
   <requestHandler name="/replication" class="solr.ReplicationHandler" > 
   </requestHandler>
+  <requestHandler name="/dataimport" class="org.apache.solr.handler.dataimport.DataImportHandler">
+    <lst name="defaults">
+      <str name="config">data-config.xml</str>
+    </lst>
+  </requestHandler>
+
 
   <searchComponent name="spellcheck" class="solr.SpellCheckComponent">
 

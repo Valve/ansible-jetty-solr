@@ -111,6 +111,7 @@
     - rm -rf /opt/solr/collection1/conf
     - rm -rf /opt/solr/collection1/core.properties
     - mkdir  /opt/solr/collection1/conf
+    - mkdir  /opt/solr/lib
 
 - name: copy local solr config to the server
   tags: solr
@@ -118,8 +119,13 @@
   with_items:
     - {src: "../../common/conf/solrconfig.xml", dest: "/opt/solr/collection1/conf/solrconfig.xml"}
     - {src: "../../common/conf/schema.xml", dest: "/opt/solr/collection1/conf/schema.xml"}
+    - {src: "../../common/conf/data-config.xml", dest: "/opt/solr/collection1/conf/data-config.xml"}
     - {src: "../../common/conf/stopwords.txt", dest: "/opt/solr/collection1/conf/stopwords.txt"}
     - {src: "solr/core.properties", dest: "/opt/solr/collection1/core.properties"}
+
+- name: download jdbc Postgres driver
+  tags: solr
+  get_url: url={{jdbc_postgres_download_url}} dest=/opt/solr/lib/
 
 
 - name: chown all dirs

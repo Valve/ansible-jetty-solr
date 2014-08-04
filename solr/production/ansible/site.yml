@@ -11,5 +11,8 @@
     solr_archive_path: "{{src_solr_path}}.tgz"
     solr_download_url: http://apache-mirror.rbc.ru/pub/apache/lucene/solr/{{solr_version}}/{{solr_archive_path}}
 
+    jdbc_postgres_version: 9.3-1102
+    jdbc_postgres_download_url: http://jdbc.postgresql.org/download/postgresql-{{jdbc_postgres_version}}.jdbc3.jar
+
   tasks:
     - include: provision.yml

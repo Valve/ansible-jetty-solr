@@ -26,7 +26,7 @@
       <str name="dir">${solr.ulog.dir:}</str>
     </updateLog>
 
-     <autoCommit> 
+<!--      <autoCommit> 
        <maxTime>15000</maxTime> 
        <openSearcher>false</openSearcher> 
      </autoCommit>
@@ -34,22 +34,22 @@
      <autoSoftCommit> 
        <maxTime>5000</maxTime> 
      </autoSoftCommit>
-  </updateHandler>
+ -->  </updateHandler>
 
   <query>
     <maxBooleanClauses>1024</maxBooleanClauses>
     <filterCache class="solr.FastLRUCache"
-                 size="512"
+                 size="2048"
                  initialSize="512"
                  autowarmCount="0"/>
 
     <queryResultCache class="solr.LRUCache"
-                     size="512"
+                     size="4096"
                      initialSize="512"
                      autowarmCount="0"/>
    
     <documentCache class="solr.LRUCache"
-                   size="512"
+                   size="4096"
                    initialSize="512"
                    autowarmCount="0"/>
 
